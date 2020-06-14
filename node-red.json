@@ -1,0 +1,1815 @@
+[
+    {
+        "id": "be387ed6.33627",
+        "type": "json",
+        "z": "c624ac0d.208b4",
+        "name": "",
+        "x": 1333.015625,
+        "y": 1569.9999923706055,
+        "wires": [
+            [
+                "d486e12d.f5f5e"
+            ]
+        ]
+    },
+    {
+        "id": "f50ec6a9.323108",
+        "type": "ui_template",
+        "z": "c624ac0d.208b4",
+        "group": "6702ed7d.913164",
+        "name": "Topology",
+        "order": 1,
+        "width": "16",
+        "height": "9",
+        "format": "<script> var NodeIconsPath = '../topology/img/';</script>\n\n<link rel=\"stylesheet\" href=\"../topology/css/topology.css\" />\n<link rel=\"stylesheet\" href=\"../topology/css/topology-map.css\" />\n<link rel=\"stylesheet\" href=\"../topology/css/d3/d3-context-menu.css\" />\n\n<div id=\"ui-topology-container\"></div>\n\n<script src=\"../topology/js/d3/d3.min.js\"></script> \n<script src=\"../topology/js/d3/d3-context-menu.js\"></script> \n<script src=\"../topology/js/colors.js\"></script>\n<script src=\"../topology/js/config.js\"></script>\n<script src=\"../topology/js/helpers.js\"></script>\n<script src=\"../topology/js/visualization.js\"></script>\n<script src=\"../topology/js/nodered.js\"></script>\n<script>if (opts.theme !== undefined) $('body').addClass('ui-topology-theme-'+opts.theme);</script>\n<script>\nvar datanow = null;\nvar topologyscope = scope;\n\n$(function() {\nsetTimeout(function(){ // TODO : Find a better way to init topology after AngularJS load\n    if (opts.debugMode) $('body').addClass('debugmode');\n    var topvis = new TopologyVisualization(opts);\n\n    (function(topologyscope) { // Scope belongs to Angular JS \n        topologyscope.$watch('msg.payload', function(data) {\n            topvis.loadData(data);\n            datanow = data;\n        });\n    })(topologyscope);\n}, 1500);\n});\n\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "x": 1923.015625,
+        "y": 1529.9999923706055,
+        "wires": [
+            [
+                "ebd1c529.ed3968"
+            ]
+        ]
+    },
+    {
+        "id": "dec7a12c.03b24",
+        "type": "ui_template",
+        "z": "c624ac0d.208b4",
+        "group": "76e83c89.9a6524",
+        "name": "Topology Debug Log",
+        "order": 1,
+        "width": "5",
+        "height": "18",
+        "format": "<ul style=\"\n    list-style-type: none;\n    font-size: 12px;padding: 0px;\n\n    -moz-transform: rotate(180deg);\n    -webkit-transform: rotate(180deg);\n    transform: rotate(180deg);\n    \n\">\n    <li ng-repeat=\"x in msg.payload\" style=\"\n        border-bottom: 1px black dashed;\n        padding: 10px 0px 5px 0px;\n\n    -moz-transform: rotate(180deg);\n    -webkit-transform: rotate(180deg);\n    transform: rotate(180deg);        \n        \n    \">\n     <b>{{x.title}}</b>\n        <ul style=\"\n    list-style-type: none;padding: 0px;\n        \">\n            <li><pre>{{x.payload}}</pre></li>\n        </ul>\n    </li>\n</ul>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "x": 2623.015625,
+        "y": 1449.9999923706055,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a5c4b11c.75c1e",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "Debug Log",
+        "func": "var topologyLog = context.get('topologyLog')|| [];\ntopologyLog.push(msg);\nif (topologyLog.length > 20){\n    // Delete oldest message if > 20\n    topologyLog.shift();\n    topologyLog.length = 20;\n} \ncontext.set('topologyLog',topologyLog);\nmsg = {};\n//msg.payload = topologyLog.reverse();\nmsg.payload = topologyLog;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2413.015625,
+        "y": 1449.9999923706055,
+        "wires": [
+            [
+                "dec7a12c.03b24"
+            ]
+        ]
+    },
+    {
+        "id": "98f9e3c8.5ca2d",
+        "type": "comment",
+        "z": "c624ac0d.208b4",
+        "name": "Actions",
+        "info": "",
+        "x": 1173.015625,
+        "y": 749.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "d4ada5d3.4d25b8",
+        "type": "comment",
+        "z": "c624ac0d.208b4",
+        "name": "SDN Routing  - v.1.4.0",
+        "info": "",
+        "x": 1183.015625,
+        "y": 189.99999237060547,
+        "wires": []
+    },
+    {
+        "id": "993bb1ab.46679",
+        "type": "link in",
+        "z": "c624ac0d.208b4",
+        "name": "SDN - TCP Input",
+        "links": [],
+        "x": 1238.015625,
+        "y": 1549.9999923706055,
+        "wires": [
+            [
+                "be387ed6.33627"
+            ]
+        ]
+    },
+    {
+        "id": "80f6599b.3fdfb8",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "TCP CMD",
+        "func": "// Create Command\nconfig = flow.get('coral_sdn_config') || {};\ncmd = {};\nswitch (msg.payload) {\n    case \"START\":\n    case \"UPDATE\":\n        // Detect Empty Settings\n        config.SUNK = config.SUNK || \"\";\n        config.TCT = config.TCT || 0; // \n        config.ACK = config.ACK || 0; // \n        config.RET = config.RET || 0; // Retransmition Delay\n        config.ROUT = config.ROUT || 0; // Routing Configuration\n        config.LQEA = config.LQEA || 0; // Link Quality Estimation Algorithm\n        cmdName = '';\n        switch (msg.payload) {\n            case \"START\":\n                cmdName = \"Start\";\n            break;\n            case \"UPDATE\":\n                cmdName  = \"Update\";\n            break;\n        }\n        cmd.payload = '{\"CMD\":\"'+cmdName+'\", \"SINK\":\"'+config.SUNK+'\",\"TCT\":'+config.TCT+',\"ACK\":'+config.ACK+',\"RET\":'+config.RET+',\"ROUT\":'+config.ROUT+',\"LQEA\":'+config.LQEA+',\"MOB\":60000}';\n        break;\n    case \"STOPCLEAR\":\n        cmd.payload = '{\"CMD\":\"Clear\"}';\n    break;\n    case \"SAVE\":\n        config.EXPTITLE = config.EXPTITLE || \"\";\n        cmd.payload = '{\"CMD\":\"Save\",\"FILE\":\"'+config.EXPTITLE+'\"}';\n        break;\n    case \"CLEAROUTES\":\n        cmd.payload = '{\"CMD\":\"ClearRoutes\"}';\n    break;\n        \n    default:\n        return null;\n}\n\n//cmd.payload = JSON.stringify(msg.payload)+\"\\n\";    \ncmd.payload = cmd.payload+\"\\n\";    \nreturn cmd;",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1473.015625,
+        "y": 869.9999923706055,
+        "wires": [
+            [
+                "fe6007eb.fd0668"
+            ]
+        ]
+    },
+    {
+        "id": "76a668df.6071e8",
+        "type": "ui_button",
+        "z": "c624ac0d.208b4",
+        "name": "Start",
+        "group": "bf22655d.d25618",
+        "order": 1,
+        "width": "2",
+        "height": "1",
+        "label": "Start",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "START",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1273.015625,
+        "y": 789.9999923706055,
+        "wires": [
+            [
+                "80f6599b.3fdfb8"
+            ]
+        ]
+    },
+    {
+        "id": "e32a7c2b.11423",
+        "type": "ui_button",
+        "z": "c624ac0d.208b4",
+        "name": "Stop/Clear",
+        "group": "bf22655d.d25618",
+        "order": 5,
+        "width": "3",
+        "height": "1",
+        "label": "Stop/Clear",
+        "color": "white",
+        "bgcolor": "#B71C1C",
+        "icon": "",
+        "payload": "STOPCLEAR",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1253.015625,
+        "y": 949.9999923706055,
+        "wires": [
+            [
+                "80f6599b.3fdfb8",
+                "87deceea.17bfe"
+            ]
+        ]
+    },
+    {
+        "id": "3329e94e.184496",
+        "type": "ui_button",
+        "z": "c624ac0d.208b4",
+        "name": "Save",
+        "group": "bf22655d.d25618",
+        "order": 4,
+        "width": "2",
+        "height": "1",
+        "label": "Save",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "SAVE",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1273.015625,
+        "y": 909.9999923706055,
+        "wires": [
+            [
+                "80f6599b.3fdfb8"
+            ]
+        ]
+    },
+    {
+        "id": "2e9a5bfe.04b2c4",
+        "type": "ui_text_input",
+        "z": "c624ac0d.208b4",
+        "name": "SINK ID",
+        "label": "SINK ID",
+        "group": "35e0ea92.3c3de6",
+        "order": 2,
+        "width": "8",
+        "height": "1",
+        "passthru": true,
+        "mode": "text",
+        "delay": 300,
+        "topic": "SUNK",
+        "x": 1503.015625,
+        "y": 329.99999237060547,
+        "wires": [
+            [
+                "c130806c.0ed31"
+            ]
+        ]
+    },
+    {
+        "id": "3b6afe4e.771952",
+        "type": "switch",
+        "z": "c624ac0d.208b4",
+        "name": "DataType Split",
+        "property": "payload.DTP",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "NET",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "MON",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "TOP",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "LOG",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "CHA",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "CH1",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "CH2",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "CH3",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 8,
+        "x": 1663.015625,
+        "y": 1569.9999923706055,
+        "wires": [
+            [
+                "5614bb22.481864"
+            ],
+            [
+                "3071d459.d1a5dc"
+            ],
+            [
+                "f50ec6a9.323108",
+                "823f69ed.e9b798"
+            ],
+            [
+                "ed7b77c1.b41878"
+            ],
+            [
+                "f81c0bb6.256c88"
+            ],
+            [
+                "7b9f94a3.d9b6ec"
+            ],
+            [
+                "75c00b92.dcbba4"
+            ],
+            [
+                "8d70cf06.d13d3"
+            ]
+        ]
+    },
+    {
+        "id": "cfb205b4.b5a3d8",
+        "type": "comment",
+        "z": "c624ac0d.208b4",
+        "name": "Topology Visualization",
+        "info": "",
+        "x": 1958.0156707763672,
+        "y": 1422.5000953674316,
+        "wires": []
+    },
+    {
+        "id": "c130806c.0ed31",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "Store Config",
+        "func": "var config = flow.get('coral_sdn_config') || {};\nconfig[msg.topic] = msg.payload;\nflow.set('coral_sdn_config',config);",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1833.015625,
+        "y": 489.99999237060547,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bf6920b.dc2aae",
+        "type": "inject",
+        "z": "c624ac0d.208b4",
+        "name": "Default 01.00",
+        "topic": "",
+        "payload": "01.00",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "x": 1303.015625,
+        "y": 329.99999237060547,
+        "wires": [
+            [
+                "2e9a5bfe.04b2c4"
+            ]
+        ]
+    },
+    {
+        "id": "c12af418.17db28",
+        "type": "ui_template",
+        "z": "c624ac0d.208b4",
+        "group": "35e0ea92.3c3de6",
+        "name": "Topology Control Configuration[L]",
+        "order": 3,
+        "width": "0",
+        "height": "0",
+        "format": "<div style=\"\n    border-top: 1px dashed #000000;\n    padding-top: 10px;\">\n    <b>Topology Control Configuration</b>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "x": 1483.015625,
+        "y": 369.99999237060547,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9c905eac.fc2b7",
+        "type": "ui_dropdown",
+        "z": "c624ac0d.208b4",
+        "name": "TC Adv/NodeNeight",
+        "label": "",
+        "group": "35e0ea92.3c3de6",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "options": [
+            {
+                "label": "Topology control advertisement based",
+                "value": 0,
+                "type": "num"
+            },
+            {
+                "label": "Topology control node neighbors list based",
+                "value": 1,
+                "type": "num"
+            }
+        ],
+        "payload": "",
+        "topic": "TCT",
+        "x": 1503.015625,
+        "y": 409.99999237060547,
+        "wires": [
+            [
+                "c130806c.0ed31"
+            ]
+        ]
+    },
+    {
+        "id": "cf734125.c4178",
+        "type": "ui_dropdown",
+        "z": "c624ac0d.208b4",
+        "name": "TC Acknowledgements",
+        "label": "",
+        "group": "35e0ea92.3c3de6",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "options": [
+            {
+                "label": "Topology control with Acknowledgement",
+                "value": 1,
+                "type": "num"
+            },
+            {
+                "label": "Topology control without Acknowledgement",
+                "value": 0,
+                "type": "num"
+            }
+        ],
+        "payload": "",
+        "topic": "ACK",
+        "x": 1493.015625,
+        "y": 449.99999237060547,
+        "wires": [
+            [
+                "c130806c.0ed31"
+            ]
+        ]
+    },
+    {
+        "id": "482f9438.51155c",
+        "type": "ui_template",
+        "z": "c624ac0d.208b4",
+        "group": "35e0ea92.3c3de6",
+        "name": "Routing Configuration[L]",
+        "order": 7,
+        "width": "8",
+        "height": "1",
+        "format": "<div style=\"\n    border-top: 1px dashed #000000;\n    padding-top: 10px;\">\n    <b>Routing Configuration</b>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "x": 1513.015625,
+        "y": 569.9999923706055,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d67f68a2.717ca8",
+        "type": "ui_dropdown",
+        "z": "c624ac0d.208b4",
+        "name": "Routing Configuration",
+        "label": "",
+        "tooltip": "",
+        "place": "",
+        "group": "35e0ea92.3c3de6",
+        "order": 8,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "multiple": true,
+        "options": [
+            {
+                "label": "Next hop only",
+                "value": 0,
+                "type": "num"
+            },
+            {
+                "label": "Total Path ",
+                "value": 1,
+                "type": "num"
+            }
+        ],
+        "payload": "",
+        "topic": "ROUT",
+        "x": 1503.015625,
+        "y": 609.9999923706055,
+        "wires": [
+            [
+                "c130806c.0ed31"
+            ]
+        ]
+    },
+    {
+        "id": "eb0060ea.b6a66",
+        "type": "ui_numeric",
+        "z": "c624ac0d.208b4",
+        "name": "Retransmission delay",
+        "label": "Retransmission delay",
+        "group": "35e0ea92.3c3de6",
+        "order": 6,
+        "width": "8",
+        "height": "1",
+        "passthru": true,
+        "topic": "RET",
+        "format": "{{value}}",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "x": 1503.015625,
+        "y": 509.99999237060547,
+        "wires": [
+            [
+                "c130806c.0ed31"
+            ]
+        ]
+    },
+    {
+        "id": "57fd44d5.aca6ec",
+        "type": "inject",
+        "z": "c624ac0d.208b4",
+        "name": "Default 0",
+        "topic": "",
+        "payload": "0",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "x": 1283.015625,
+        "y": 609.9999923706055,
+        "wires": [
+            [
+                "d67f68a2.717ca8"
+            ]
+        ]
+    },
+    {
+        "id": "fa39c68d.8f3fe8",
+        "type": "inject",
+        "z": "c624ac0d.208b4",
+        "name": "Default 0",
+        "topic": "",
+        "payload": "0",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "x": 1283.015625,
+        "y": 449.99999237060547,
+        "wires": [
+            [
+                "cf734125.c4178"
+            ]
+        ]
+    },
+    {
+        "id": "6af6a38e.f9f76c",
+        "type": "inject",
+        "z": "c624ac0d.208b4",
+        "name": "Default 0",
+        "topic": "",
+        "payload": "0",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "x": 1283.015625,
+        "y": 409.99999237060547,
+        "wires": [
+            [
+                "9c905eac.fc2b7"
+            ]
+        ]
+    },
+    {
+        "id": "262bad6e.a2d472",
+        "type": "comment",
+        "z": "c624ac0d.208b4",
+        "name": "Config",
+        "info": "",
+        "x": 1173.015625,
+        "y": 249.99999237060547,
+        "wires": []
+    },
+    {
+        "id": "c2b18b1d.1695a8",
+        "type": "ui_template",
+        "z": "c624ac0d.208b4",
+        "group": "fe9bc199.22463",
+        "name": "Network Data",
+        "order": 1,
+        "width": "12",
+        "height": "2",
+        "format": "<style>\n    /* Patch Page Auto Width */\n    md-content.flex .masonry-container {\n        width:1400px;\n        margin: auto;\n    }\n</style>\n\n<h3 style=\"font-weight: normal;\">NetWork Setup</h3>\n<div ng-if=\"!msg.enabled\">\n    <p class=\"blank-label ng-binding ng-scope\">Waiting for Data</p>\n</div>\n<div ng-if=\"msg.enabled\">\n<table>\n    <tr>\n        <td>\n            <div>\n                <span><b>Network Nodes</b> :</span>\n                <span>{{ msg.nodes }}</span>\n            </div>\n            <div>\n                <span><b>Sink Nodes</b> :</span>\n                <span>{{ msg.sink }}</span>\n            </div>\n        </td>\n        <td>&nbsp;</td>\n        <td>\n            <div>\n                <span><b>Static Nodes</b> :</span>\n                <span>{{ msg.static }}</span>\n            </div>\n            <div>\n                <span><b>Mobile Nodes</b> :</span>\n                <span>{{ msg.mobile }}</span>\n            </div>\n        </td>\n        <td>&nbsp;</td>\n        <td>\n            <div>\n                <span><b>Links</b> :</span>\n                <span>{{ msg.links }}</span>\n            </div>\n            <div>\n                &nbsp;\n            </div>\n        </td>\n    </tr>\n</table>    \n\n</div>\n\n\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "x": 2283.015625,
+        "y": 1169.9999923706055,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "46a45c2.dbb94a4",
+        "type": "ui_template",
+        "z": "c624ac0d.208b4",
+        "group": "14902bc0.c23a34",
+        "name": "Monitoring Info",
+        "order": 1,
+        "width": "12",
+        "height": "2",
+        "format": "<h3 style=\"font-weight: normal;\">Monitoring Information</h3>\n<table>\n    <tr>\n        <td>\n            <div>\n                <span><b>Date</b> :</span>\n                <span>{{msg.timeNow | date:'mediumDate'}}</span>\n            </div>\n            <div>\n                <span><b>Time</b> :</span>\n                <span>{{msg.timeNow | date:'mediumTime'}}</span>\n            </div>\n        </td>\n        <td>&nbsp;</td>\n        <td>\n            <div ng-if=\"msg.elapsedTime\">\n                <div>\n                    <span><b>Elapsed Time</b> :</span>\n                    <span>{{ msg.elapsedTime }}</span>\n                </div>\n            </div>\n            <div>&nbsp;</div>\n        </td>\n    </tr>\n</table>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "x": 2283.015625,
+        "y": 1309.9999923706055,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5614bb22.481864",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "Parse N.S. Data",
+        "func": "network = {};\ncurNetwork = flow.get('coral_netowork') || {};\n\n// Get Payload Values or Stored Values (if not exist)\nif (msg.payload.NODES === 0) { network.nodes = 0; } else { network.nodes = msg.payload.NODES || (curNetwork.nodes || 0); }\nif (msg.payload.SINK === 0) { network.sink = 0; } else { network.sink = msg.payload.SINK || (curNetwork.sink || 0); }\nif (msg.payload.STATIC === 0) { network.static = 0; } else { network.static = msg.payload.STATIC || (curNetwork.static || 0); }\nif (msg.payload.MOBILE === 0) { network.mobile = 0; } else { network.mobile = msg.payload.MOBILE || (curNetwork.mobile || 0); }\nif (msg.payload.LINKS === 0) { network.links = 0; } else { network.links = msg.payload.LINKS || (curNetwork.links || 0); }\n\n// Detect Zero Network\nif ( (network.nodes + network.sink + network.static + network.mobile + network.links) === 0) {\n    network.enabled = false;\n    network = {};\n} else {\n    network.enabled = true;\n}\n\nflow.set('coral_netowork',network);\nreturn network;",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 2063.015625,
+        "y": 1169.9999923706055,
+        "wires": [
+            [
+                "c2b18b1d.1695a8"
+            ]
+        ]
+    },
+    {
+        "id": "f9b97557.958bb8",
+        "type": "inject",
+        "z": "c624ac0d.208b4",
+        "name": "Time Tick",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "x": 1893.015625,
+        "y": 1309.9999923706055,
+        "wires": [
+            [
+                "4d22c130.e8941"
+            ]
+        ]
+    },
+    {
+        "id": "e549a495.e33068",
+        "type": "comment",
+        "z": "c624ac0d.208b4",
+        "name": "Network setup",
+        "info": "",
+        "x": 1903.015625,
+        "y": 1129.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "3071d459.d1a5dc",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "Store M.I. DATA",
+        "func": "if (msg.payload.DURATION === undefined) {\n    if (msg.payload.STARTTIME !== undefined) {\n        flow.set('coral_mi_elasped_time_start', msg.payload.STARTTIME);\n        flow.set('coral_mi_elasped_status', 'run'); \n        flow.set('coral_mi_elasped_duration', null); \n        flow.set('coral_mi_elasped_duration_start', null);\n    }\n    // If no value detected dont change anything\n} else {\n    flow.set('coral_mi_elasped_duration', msg.payload.DURATION || null);\n    flow.set('coral_mi_elasped_duration_start', new Date().getTime());\n    flow.set('coral_mi_elasped_status', 'run'); \n}\n\nswitch (msg.payload.ACTION || null) {\n    case \"START\":\n        flow.set('coral_mi_elasped_status', 'run'); \n        break;       \n    case \"STOP\":\n        flow.set('coral_mi_elasped_status', 'stop'); \n        break;\n}",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 2063.015625,
+        "y": 1269.9999923706055,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4d22c130.e8941",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "Update Tick",
+        "func": "// Helper\nNumber.prototype.pad = function(size) {\n      var s = String(this);\n      while (s.length < (size || 2)) {s = \"0\" + s;}\n      return s;\n};\n// Monitor Info\nvar monitor = {};\nvar timeNow = msg.payload;\n\n// Get Stored Varuables\nvar elStatus = flow.get('coral_mi_elasped_status') || null;\nvar elTimeStart = flow.get('coral_mi_elasped_time_start') || null;\nvar elDuration = flow.get('coral_mi_elasped_duration') || null;\nvar elDurationStart = flow.get('coral_mi_elasped_duration_start') || null;\n\nvar elapsedTime = null;\n\nswitch (elStatus) {\n    case \"run\":\n        if (elDuration !== null) { \n            elapsedTime = elDuration + (timeNow - elDurationStart);\n        } else if (elTimeStart !== null) {\n            elapsedTime = timeNow - elTimeStart;\n        }        \n    break;\n    case \"stop\":\n        elapsedTime = null;\n        break;\n}\n\nif (elapsedTime !== null) {\n    // Construct Duration Output\n    var hours = Math.floor(elapsedTime / 36e5);\n        minutes = Math.floor(elapsedTime % 36e5 / 60000);\n        seconds = Math.floor(elapsedTime % 60000 / 1000);\n    monitor.elapsedTime = hours +\":\"+minutes.pad(2)+\":\"+seconds.pad(2);\n}\n// Construct Date/Time Output\nmonitor.timeNow = timeNow;\n\nreturn monitor;",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 2053.015625,
+        "y": 1309.9999923706055,
+        "wires": [
+            [
+                "46a45c2.dbb94a4"
+            ]
+        ]
+    },
+    {
+        "id": "a1b117ba.22c7b8",
+        "type": "comment",
+        "z": "c624ac0d.208b4",
+        "name": "Charts",
+        "info": "",
+        "x": 1873.015625,
+        "y": 1809.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "69f6df0b.6108e",
+        "type": "ui_chart",
+        "z": "c624ac0d.208b4",
+        "name": "Topology Discovery time elapsed",
+        "group": "e648c618.a069a8",
+        "order": 0,
+        "width": "12",
+        "height": "6",
+        "label": "Topology Discovery time elapsed",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "step",
+        "nodata": "Waiting for Data",
+        "ymin": "0",
+        "ymax": "",
+        "removeOlder": "30",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "x": 2223.015625,
+        "y": 1869.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "ed43d64a.1bb1a8",
+        "type": "ui_chart",
+        "z": "c624ac0d.208b4",
+        "name": "Topology Discovery Control Packets ",
+        "group": "e648c618.a069a8",
+        "order": 0,
+        "width": "12",
+        "height": "6",
+        "label": "Topology Discovery Control Packets ",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "Waiting for Data",
+        "ymin": "0",
+        "ymax": "",
+        "removeOlder": "30",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "x": 2233.015625,
+        "y": 1909.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "c776fc87.bff84",
+        "type": "ui_chart",
+        "z": "c624ac0d.208b4",
+        "name": "First Packet delivery ",
+        "group": "e648c618.a069a8",
+        "order": 0,
+        "width": "24",
+        "height": "6",
+        "label": "First Packet delivery",
+        "chartType": "bar",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "Waiting for Data",
+        "ymin": "0",
+        "ymax": "",
+        "removeOlder": "30",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "x": 2183.015625,
+        "y": 1949.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "7b9f94a3.d9b6ec",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "Chart - Parse Data",
+        "func": "// {\"DTP\":\"CH1\",\"TIME\":00,\"NODES\":00} (TIME=seconds from the beginning 0)\nvar data = {};\n// Value\ndata.payload = msg.payload.NODES;\n// Label\ndata.topic = \"Nodes\";\n\nvar dexp = {};\ndexp.rta = \"SDN\";\ndexp.name = \"Topology Discovery time elapsed\";\ndexp.title = \"Topology Discovery time elapsed\";\n// CSV //RowName;X;Y\ndata.row = [data.topic, data.payload, dexp.valY = new Date().getTime()];\ndata.export = dexp;\n\nreturn data;",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1913.015625,
+        "y": 1869.9999923706055,
+        "wires": [
+            [
+                "69f6df0b.6108e",
+                "79650ac9.da9294"
+            ]
+        ]
+    },
+    {
+        "id": "75c00b92.dcbba4",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "Chart- Parse Data",
+        "func": "//{\"DTP\":\"CH2\",”TIME”:00,\"SENT\":4,\"RECV\":5,\"TOTAL\":9}\n\n// Sent\nvar data = {}\ndata.payload = msg.payload.SENT || null;\ndata.topic = \"Sent\";\n\nnode.send(data);\n\n// Received\nvar data = {}\ndata.payload = msg.payload.RECV || null;\ndata.topic = \"Received\";\nnode.send(data);\n\n// Total\nvar data = {}\ndata.payload = msg.payload.TOTAL || null;\ndata.topic = \"Total\";\nnode.send(data);\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1913.015625,
+        "y": 1909.9999923706055,
+        "wires": [
+            [
+                "ed43d64a.1bb1a8",
+                "79650ac9.da9294"
+            ]
+        ]
+    },
+    {
+        "id": "8d70cf06.d13d3",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "Chart - Parse Data",
+        "func": "// {\"DTP\":\"CH3\",\"NID\":15,\"TIME\":1}\n\nvar data = {}\nnid = msg.payload.NID || null;\ntime = msg.payload.TIME || null;\n\ndata.payload = time;\ndata.topic = nid;\nreturn data;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1913.015625,
+        "y": 1949.9999923706055,
+        "wires": [
+            [
+                "c776fc87.bff84",
+                "79650ac9.da9294"
+            ]
+        ]
+    },
+    {
+        "id": "f24db016.07c44",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "CMD:Topology",
+        "func": "nodeData = JSON.parse(msg.payload); \n\nvar node = {};\nnode.ID = nodeData.id || null;\nnode.TYPE = nodeData.type || null;\n\nif ((node.ID) && (node.TYPE)) {\n    cmd = {};\n    cmd.payload = '{\"CMD\":\"Topology\",\"NID\":\"'+node.ID+'\"}';\n    cmd.payload = cmd.payload+\"\\n\";\n    return cmd;\n} else {\n    return null;\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2423.015625,
+        "y": 1489.9999923706055,
+        "wires": [
+            [
+                "c8c12ecb.5902a"
+            ]
+        ]
+    },
+    {
+        "id": "ebd1c529.ed3968",
+        "type": "switch",
+        "z": "c624ac0d.208b4",
+        "name": "Topology Response",
+        "property": "command",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "debugLog",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "shiftClick",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "topology",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "ctrlClick",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "message",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "altClick",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "shiftctrlClick",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "altctrlClick",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "altshiftClick",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 9,
+        "x": 2183.015625,
+        "y": 1529.9999923706055,
+        "wires": [
+            [
+                "a5c4b11c.75c1e"
+            ],
+            [
+                "f24db016.07c44"
+            ],
+            [
+                "f24db016.07c44"
+            ],
+            [
+                "816ce4d4.47ea28"
+            ],
+            [
+                "816ce4d4.47ea28"
+            ],
+            [],
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "359fe36.87b5f1c",
+        "type": "ui_text_input",
+        "z": "c624ac0d.208b4",
+        "name": "Experiment Title  ",
+        "label": "Experiment Title",
+        "group": "35e0ea92.3c3de6",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "mode": "text",
+        "delay": 300,
+        "topic": "EXPTITLE",
+        "x": 1523.015625,
+        "y": 289.99999237060547,
+        "wires": [
+            [
+                "c130806c.0ed31"
+            ]
+        ]
+    },
+    {
+        "id": "816ce4d4.47ea28",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "CMD:Message",
+        "func": "nodeData = JSON.parse(msg.payload); \n\nvar node = {};\nnode.ID = nodeData.id || null;\nnode.TYPE = nodeData.type || null;\n\nif ((node.ID) && (node.TYPE)) {\n    cmd = {};\n    cmd.payload = '{\"CMD\":\"Message\",\"NID\":\"'+node.ID+'\"}';\n    cmd.payload = cmd.payload+\"\\n\";\n    return cmd;\n} else {\n    return null;\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2423.015625,
+        "y": 1529.9999923706055,
+        "wires": [
+            [
+                "c8c12ecb.5902a"
+            ]
+        ]
+    },
+    {
+        "id": "8cc75c1e.57482",
+        "type": "ui_template",
+        "z": "c624ac0d.208b4",
+        "group": "be9d8c98.cb934",
+        "name": "Message Log",
+        "order": 1,
+        "width": "24",
+        "height": "4",
+        "format": "<h3 style=\"font-weight: normal;\">Messages</h3>\n<ul style=\"\n    list-style-type: none;\n    font-size: 14px;\n    padding: 0px;\n    margin:0px;\n    -moz-transform: rotate(180deg);\n    -webkit-transform: rotate(180deg);\n    transform: rotate(180deg);\n\">\n    <li ng-repeat=\"x in msg.payload\" style=\"\n        padding: 2px 0px 0px 0px;\n    \n        -moz-transform: rotate(180deg);\n        -webkit-transform: rotate(180deg);\n        transform: rotate(180deg);        \n    \">\n        <ul style=\"list-style-type: none;padding: 0px;\">\n            <li><b>\n                [ {{ x.time | date :  \"HH:mm:ss\" }} ]</b> {{x.payload}}</li>\n        </ul>\n    </li>\n</ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "x": 2123.015625,
+        "y": 1709.9999923706055,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ed7b77c1.b41878",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "Prepair Message",
+        "func": "var messagesLog = flow.get('messagesLog') || [];\nvar msgKeep = 500;\n\nline = {};\nline.payload = msg.payload.MSG || \"\";\nline.time = msg.payload.TIME || new Date().getTime();\n\nmessagesLog.push(line);\nif (messagesLog.length > msgKeep){\n    // Delete oldest message if > 50\n    messagesLog.shift();\n    messagesLog.length = msgKeep;\n} \nflow.set('messagesLog',messagesLog);\nmsg = {};\n//msg.payload = topologyLog.reverse();\nmsg.payload = messagesLog;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1913.015625,
+        "y": 1709.9999923706055,
+        "wires": [
+            [
+                "8cc75c1e.57482"
+            ]
+        ]
+    },
+    {
+        "id": "bfefb5bc.e76d48",
+        "type": "comment",
+        "z": "c624ac0d.208b4",
+        "name": "Message Log",
+        "info": "",
+        "x": 1893.015625,
+        "y": 1669.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "2a66fcf2.b9c8d4",
+        "type": "ui_button",
+        "z": "c624ac0d.208b4",
+        "name": "Update",
+        "group": "bf22655d.d25618",
+        "order": 2,
+        "width": "2",
+        "height": "1",
+        "label": "Update",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "UPDATE",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1263.015625,
+        "y": 829.9999923706055,
+        "wires": [
+            [
+                "80f6599b.3fdfb8"
+            ]
+        ]
+    },
+    {
+        "id": "4635c5a8.33567c",
+        "type": "ui_button",
+        "z": "c624ac0d.208b4",
+        "name": "Clear Routes",
+        "group": "bf22655d.d25618",
+        "order": 3,
+        "width": "3",
+        "height": "1",
+        "label": "Clear Routes",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "CLEAROUTES",
+        "payloadType": "str",
+        "topic": "",
+        "x": 1253.015625,
+        "y": 869.9999923706055,
+        "wires": [
+            [
+                "80f6599b.3fdfb8"
+            ]
+        ]
+    },
+    {
+        "id": "b524bdb3.3a40f",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "Clear",
+        "func": "var outNetworkSetup = {};\noutNetworkSetup.payload = {\"NODES\":0,\"SINK\":0,\"STATIC\":0,\"MOBILE\":0,\"LINKS\":0}\nreturn outNetworkSetup;",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1873.015625,
+        "y": 1169.9999923706055,
+        "wires": [
+            [
+                "5614bb22.481864"
+            ]
+        ]
+    },
+    {
+        "id": "87deceea.17bfe",
+        "type": "link out",
+        "z": "c624ac0d.208b4",
+        "name": "SDN - Execute Stop/Clear",
+        "links": [
+            "6a5ce1b5.499be",
+            "dc21e4a5.3beaa8",
+            "eb2f8fb3.c09bd",
+            "f1224968.589ba8",
+            "9dffc510.a42b58"
+        ],
+        "x": 1418.015625,
+        "y": 909.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "eb2f8fb3.c09bd",
+        "type": "link in",
+        "z": "c624ac0d.208b4",
+        "name": "SDN - Execute Stop/Clear",
+        "links": [
+            "51e53db7.3727f4",
+            "7763a1bb.31b9c",
+            "87deceea.17bfe",
+            "1b9ebdaa.7f5162"
+        ],
+        "x": 1798.015625,
+        "y": 1169.9999923706055,
+        "wires": [
+            [
+                "b524bdb3.3a40f"
+            ]
+        ]
+    },
+    {
+        "id": "65822a13.8137e4",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "Clear",
+        "func": "// Clear Topology\noutTopology = {}\noutTopology.payload = {\"CMD\":\"clearAll\"};\nreturn outTopology;",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1933.015625,
+        "y": 1589.9999923706055,
+        "wires": [
+            [
+                "f50ec6a9.323108",
+                "823f69ed.e9b798"
+            ]
+        ]
+    },
+    {
+        "id": "dc21e4a5.3beaa8",
+        "type": "link in",
+        "z": "c624ac0d.208b4",
+        "name": "SDN - Execute Stop/Clear",
+        "links": [
+            "51e53db7.3727f4",
+            "7763a1bb.31b9c",
+            "87deceea.17bfe",
+            "1b9ebdaa.7f5162"
+        ],
+        "x": 1858.015625,
+        "y": 1589.9999923706055,
+        "wires": [
+            [
+                "65822a13.8137e4"
+            ]
+        ]
+    },
+    {
+        "id": "5c2221cb.a7451",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "Clear",
+        "func": "// Clear Message Log\nvar messagesLog = [];\nflow.set('messagesLog',messagesLog);\noutMsg = {};\noutMsg.payload = messagesLog;\nreturn outMsg;",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1953.015625,
+        "y": 1749.9999923706055,
+        "wires": [
+            [
+                "8cc75c1e.57482"
+            ]
+        ]
+    },
+    {
+        "id": "f1224968.589ba8",
+        "type": "link in",
+        "z": "c624ac0d.208b4",
+        "name": "SDN - Execute Stop/Clear",
+        "links": [
+            "87deceea.17bfe"
+        ],
+        "x": 1878.015625,
+        "y": 1749.9999923706055,
+        "wires": [
+            [
+                "5c2221cb.a7451"
+            ]
+        ]
+    },
+    {
+        "id": "e4fc9340.06f65",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "Clear",
+        "func": "var outChart = {};\noutChart.payload = [];\nreturn outChart;",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 1693.015625,
+        "y": 1909.9999923706055,
+        "wires": [
+            [
+                "69f6df0b.6108e",
+                "ed43d64a.1bb1a8",
+                "c776fc87.bff84"
+            ]
+        ]
+    },
+    {
+        "id": "9dffc510.a42b58",
+        "type": "link in",
+        "z": "c624ac0d.208b4",
+        "name": "SDN - Execute Stop/Clear",
+        "links": [
+            "51e53db7.3727f4",
+            "7763a1bb.31b9c",
+            "87deceea.17bfe",
+            "1b9ebdaa.7f5162"
+        ],
+        "x": 1618.015625,
+        "y": 1909.9999923706055,
+        "wires": [
+            [
+                "e4fc9340.06f65"
+            ]
+        ]
+    },
+    {
+        "id": "30ae5c94.29bdd4",
+        "type": "link in",
+        "z": "c624ac0d.208b4",
+        "name": "SDN - TCP OutPut",
+        "links": [
+            "c8c12ecb.5902a"
+        ],
+        "x": 1518.015625,
+        "y": 909.9999923706055,
+        "wires": [
+            [
+                "fe6007eb.fd0668"
+            ]
+        ]
+    },
+    {
+        "id": "c8c12ecb.5902a",
+        "type": "link out",
+        "z": "c624ac0d.208b4",
+        "name": "SDN - TCP OutPut",
+        "links": [
+            "30ae5c94.29bdd4"
+        ],
+        "x": 2598.015625,
+        "y": 1509.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "78c46b01.de0644",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "Clear Monitor",
+        "func": "flow.set('coral_mi_elasped_time_start', null);\nflow.set('coral_mi_elasped_status', 'stop'); \nflow.set('coral_mi_elasped_duration', null); \nflow.set('coral_mi_elasped_duration_start', null);\n",
+        "outputs": "1",
+        "noerr": 0,
+        "x": 2283.015625,
+        "y": 1269.9999923706055,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6a5ce1b5.499be",
+        "type": "link in",
+        "z": "c624ac0d.208b4",
+        "name": "SDN - Execute Stop/Clear",
+        "links": [
+            "51e53db7.3727f4",
+            "7763a1bb.31b9c",
+            "87deceea.17bfe",
+            "1b9ebdaa.7f5162"
+        ],
+        "x": 2178.015625,
+        "y": 1269.9999923706055,
+        "wires": [
+            [
+                "78c46b01.de0644"
+            ]
+        ]
+    },
+    {
+        "id": "145be28.b935c1e",
+        "type": "comment",
+        "z": "c624ac0d.208b4",
+        "name": "Monitor Info",
+        "info": "",
+        "x": 1893.015625,
+        "y": 1229.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "a8511b86.e89218",
+        "type": "file",
+        "z": "c624ac0d.208b4",
+        "name": "Export to File",
+        "filename": "",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "x": 1843.015625,
+        "y": 2049.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "97ef5e7e.5f6f9",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "Format Data",
+        "func": "var rta = \"SDN\";\nvar dexp = global.get('coral_dataExport') || {};\n\nvar enableRecording = dexp.ACTIVE || false;\nvar recordingRTA = dexp.RTA || \"\";\n\nif ((enableRecording) && (recordingRTA === rta )) {\n    var recordingFilepath = dexp.FILEPATH || \"\";\n    var exportFilename = dexp.FILENAME || \"\";\n    if ((exportFilename) && (recordingFilepath)) {\n        var filename = recordingFilepath + exportFilename + \"-\" + recordingRTA.toLowerCase() + \"-cmd-input.log\";\n        msg.filename = filename;\n        msg.payload.RECTIME = new Date().getTime();\n        msg.payload = JSON.stringify(msg.payload);\n        return msg;\n    }\n}\nreturn null;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1673.015625,
+        "y": 2049.9999923706055,
+        "wires": [
+            [
+                "a8511b86.e89218"
+            ]
+        ]
+    },
+    {
+        "id": "9c72ef47.fcf79",
+        "type": "comment",
+        "z": "c624ac0d.208b4",
+        "name": "Log Data",
+        "info": "",
+        "x": 1543.015625,
+        "y": 2009.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "fe6007eb.fd0668",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "SDN Check",
+        "func": "// Check Active Routing\n//var config = global.get('coral_config') || {};\n//if (config.ACTIVEROUTING === 'SDN') {\n    return [null,msg];\n//} else {\n//    not = {};\n//    not.payload = \"You must deploy SDN Routing first\";    \n//    not.loadtab = \"CORAL\"\n//    return [not,null];\n//}\n",
+        "outputs": "2",
+        "noerr": 0,
+        "x": 1673.015625,
+        "y": 889.9999923706055,
+        "wires": [
+            [
+                "bc03f9bc.663c48"
+            ],
+            [
+                "a12db7bf.fe2aa8"
+            ]
+        ]
+    },
+    {
+        "id": "bc03f9bc.663c48",
+        "type": "link out",
+        "z": "c624ac0d.208b4",
+        "name": "CORAL - Notification",
+        "links": [],
+        "x": 2078.015625,
+        "y": 869.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "d486e12d.f5f5e",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "SDN Check",
+        "func": "routing = msg.payload.RTA || false;\nif (routing) {\n    if (routing === \"SDN\") return msg;\n} else {\n    // Check Active Routing\n    var config = global.get('coral_config') || {};\n    if (config.ACTIVEROUTING === 'SDN') {\n        return msg;    \n    } else {\n        return null;    \n    }\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1473.015625,
+        "y": 1569.9999923706055,
+        "wires": [
+            [
+                "3b6afe4e.771952",
+                "97ef5e7e.5f6f9"
+            ]
+        ]
+    },
+    {
+        "id": "e3acd716.704b08",
+        "type": "comment",
+        "z": "c624ac0d.208b4",
+        "name": "TCP CLIENT [P4/4]",
+        "info": "",
+        "x": 1173.015625,
+        "y": 1509.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "8b8b9779.b7ea38",
+        "type": "ui_dropdown",
+        "z": "c624ac0d.208b4",
+        "name": "Link Quality Estimation",
+        "label": "",
+        "group": "35e0ea92.3c3de6",
+        "order": 10,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "options": [
+            {
+                "label": "RSSI",
+                "value": 0,
+                "type": "num"
+            },
+            {
+                "label": "RSSI & Energy",
+                "value": 1,
+                "type": "num"
+            },
+            {
+                "label": "LQI",
+                "value": 2,
+                "type": "num"
+            },
+            {
+                "label": "JSI intelligent LQE algorithm",
+                "value": 3,
+                "type": "num"
+            }
+        ],
+        "payload": "",
+        "topic": "LQEA",
+        "x": 1513.015625,
+        "y": 689.9999923706055,
+        "wires": [
+            [
+                "c130806c.0ed31"
+            ]
+        ]
+    },
+    {
+        "id": "760bd03c.e33cf",
+        "type": "inject",
+        "z": "c624ac0d.208b4",
+        "name": "Default 0",
+        "topic": "",
+        "payload": "0",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "x": 1283.015625,
+        "y": 689.9999923706055,
+        "wires": [
+            [
+                "8b8b9779.b7ea38"
+            ]
+        ]
+    },
+    {
+        "id": "641c3b33.d3e914",
+        "type": "ui_template",
+        "z": "c624ac0d.208b4",
+        "group": "35e0ea92.3c3de6",
+        "name": "Link Quality Estimation[L]",
+        "order": 9,
+        "width": "8",
+        "height": "1",
+        "format": "<div style=\"\n    border-top: 1px dashed #000000;\n    padding-top: 10px;\">\n    <b>Link Quality Estimation Algorithm</b>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "x": 1513.015625,
+        "y": 649.9999923706055,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "79d0c4d8.147ccc",
+        "type": "comment",
+        "z": "c624ac0d.208b4",
+        "name": "NOTIFICATION",
+        "info": "",
+        "x": 2183.015625,
+        "y": 869.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "79650ac9.da9294",
+        "type": "link out",
+        "z": "c624ac0d.208b4",
+        "name": "CORAL - Data Export",
+        "links": [],
+        "x": 2135.515733718872,
+        "y": 2012.500171661377,
+        "wires": []
+    },
+    {
+        "id": "4293a485.0a420c",
+        "type": "link in",
+        "z": "c624ac0d.208b4",
+        "name": "CORAL - TCP Recieve",
+        "links": [
+            "7ba836ab.4791c8"
+        ],
+        "x": 1238.015625,
+        "y": 1589.9999923706055,
+        "wires": [
+            [
+                "be387ed6.33627"
+            ]
+        ]
+    },
+    {
+        "id": "f9637f85.3234c",
+        "type": "comment",
+        "z": "c624ac0d.208b4",
+        "name": "CORAL TCP",
+        "info": "",
+        "x": 1153.015625,
+        "y": 1589.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "b1713e15.52006",
+        "type": "link out",
+        "z": "c624ac0d.208b4",
+        "name": "CORAL - TCP Reply",
+        "links": [
+            "3346a151.9cc7ce"
+        ],
+        "x": 2078.015625,
+        "y": 909.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "a3f5dbd8.2b86e8",
+        "type": "comment",
+        "z": "c624ac0d.208b4",
+        "name": "SDN TCP",
+        "info": "",
+        "x": 1163.015625,
+        "y": 1549.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "ab453b73.d86a78",
+        "type": "comment",
+        "z": "c624ac0d.208b4",
+        "name": "CORAL REPLY",
+        "info": "",
+        "x": 2183.015625,
+        "y": 909.9999923706055,
+        "wires": []
+    },
+    {
+        "id": "d5a71fba.5a4fb",
+        "type": "function",
+        "z": "c624ac0d.208b4",
+        "name": "ADD RTA",
+        "func": "msg.payload.RTA = \"SDN\";\nmsg.payload = JSON.stringify(msg.payload)+\"\\n\";    \nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1963.015625,
+        "y": 909.9999923706055,
+        "wires": [
+            [
+                "b1713e15.52006"
+            ]
+        ]
+    },
+    {
+        "id": "a12db7bf.fe2aa8",
+        "type": "json",
+        "z": "c624ac0d.208b4",
+        "name": "",
+        "x": 1833.015625,
+        "y": 909.9999923706055,
+        "wires": [
+            [
+                "d5a71fba.5a4fb"
+            ]
+        ]
+    },
+    {
+        "id": "823f69ed.e9b798",
+        "type": "ui_template",
+        "z": "c624ac0d.208b4",
+        "group": "fa8d6744.b57598",
+        "name": "Topology [FULL]",
+        "order": 1,
+        "width": "33",
+        "height": "14",
+        "format": "<script> var NodeIconsPath = '../topology/img/';</script>\n\n<link rel=\"stylesheet\" href=\"../topology/css/topology.css\" />\n<link rel=\"stylesheet\" href=\"../topology/css/topology-map.css\" />\n<link rel=\"stylesheet\" href=\"../topology/css/d3/d3-context-menu.css\" />\n\n<div id=\"ui-topology-container\"></div>\n\n<script src=\"../topology/js/d3/d3.min.js\"></script> \n<script src=\"../topology/js/d3/d3-context-menu.js\"></script> \n<script src=\"../topology/js/colors.js\"></script>\n<script src=\"../topology/js/config.js\"></script>\n<script src=\"../topology/js/helpers.js\"></script>\n<script src=\"../topology/js/visualization.js\"></script>\n<script src=\"../topology/js/nodered.js\"></script>\n<script>if (opts.theme !== undefined) $('body').addClass('ui-topology-theme-'+opts.theme);</script>\n<script>\nvar datanow = null;\nvar topologyscope = scope;\n\n$(function() {\nsetTimeout(function(){ // TODO : Find a better way to init topology after AngularJS load\n    if (opts.debugMode) $('body').addClass('debugmode');\n    var topvis = new TopologyVisualization(opts);\n\n    (function(topologyscope) { // Scope belongs to Angular JS \n        topologyscope.$watch('msg.payload', function(data) {\n            topvis.loadData(data);\n            datanow = data;\n        });\n    })(topologyscope);\n}, 1500);\n});\n\n</script>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "x": 1953.015625,
+        "y": 1489.9999923706055,
+        "wires": [
+            [
+                "ebd1c529.ed3968"
+            ]
+        ]
+    },
+    {
+        "id": "f81c0bb6.256c88",
+        "type": "switch",
+        "z": "c624ac0d.208b4",
+        "name": "NEW ALTERNATIVE",
+        "property": "payload.CMD",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "TOPDISTE",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "TOPDISCP",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "FRPCKDL",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 3,
+        "x": 1383.015625,
+        "y": 1869.9999923706055,
+        "wires": [
+            [
+                "7b9f94a3.d9b6ec"
+            ],
+            [
+                "75c00b92.dcbba4"
+            ],
+            [
+                "8d70cf06.d13d3"
+            ]
+        ]
+    },
+    {
+        "id": "99971baa.7ffda8",
+        "type": "tcp in",
+        "z": "c624ac0d.208b4",
+        "name": "",
+        "server": "client",
+        "host": "localhost",
+        "port": "8992",
+        "datamode": "stream",
+        "datatype": "utf8",
+        "newline": "\\n",
+        "topic": "",
+        "base64": false,
+        "x": 2633.015625,
+        "y": 507.046875,
+        "wires": [
+            [
+                "893cd8b1.c98458",
+                "7ba836ab.4791c8"
+            ]
+        ]
+    },
+    {
+        "id": "893cd8b1.c98458",
+        "type": "template",
+        "z": "c624ac0d.208b4",
+        "name": "cut back messages",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "",
+        "x": 2913.015625,
+        "y": 507.046875,
+        "wires": [
+            [
+                "e086dd50.0a08b"
+            ]
+        ]
+    },
+    {
+        "id": "ce4f61bd.fb064",
+        "type": "comment",
+        "z": "c624ac0d.208b4",
+        "name": "TCP CLIENT",
+        "info": "",
+        "x": 2593.015625,
+        "y": 387.046875,
+        "wires": []
+    },
+    {
+        "id": "e086dd50.0a08b",
+        "type": "tcp out",
+        "z": "c624ac0d.208b4",
+        "host": "",
+        "port": "",
+        "beserver": "reply",
+        "base64": false,
+        "end": false,
+        "name": "TCP Server : Reply to all connections",
+        "x": 2973.015625,
+        "y": 467.046875,
+        "wires": []
+    },
+    {
+        "id": "7ba836ab.4791c8",
+        "type": "link out",
+        "z": "c624ac0d.208b4",
+        "name": "CORAL - TCP Recieve",
+        "links": [
+            "4293a485.0a420c"
+        ],
+        "x": 2838.015625,
+        "y": 547.046875,
+        "wires": []
+    },
+    {
+        "id": "3346a151.9cc7ce",
+        "type": "link in",
+        "z": "c624ac0d.208b4",
+        "name": "CORAL - TCP Reply",
+        "links": [
+            "b1713e15.52006"
+        ],
+        "x": 2758.015625,
+        "y": 467.046875,
+        "wires": [
+            [
+                "e086dd50.0a08b"
+            ]
+        ]
+    },
+    {
+        "id": "6702ed7d.913164",
+        "type": "ui_group",
+        "z": "",
+        "name": "Topology Visualization",
+        "tab": "6f438657.375be8",
+        "order": 3,
+        "disp": true,
+        "width": "16"
+    },
+    {
+        "id": "76e83c89.9a6524",
+        "type": "ui_group",
+        "z": "",
+        "name": "Topology Debug",
+        "tab": "cb65aebd.8aa4f",
+        "order": 1,
+        "disp": true,
+        "width": "5"
+    },
+    {
+        "id": "bf22655d.d25618",
+        "type": "ui_group",
+        "z": "",
+        "name": "Actions",
+        "tab": "6f438657.375be8",
+        "order": 2,
+        "disp": false,
+        "width": "16"
+    },
+    {
+        "id": "35e0ea92.3c3de6",
+        "type": "ui_group",
+        "z": "",
+        "name": "Configuration",
+        "tab": "6f438657.375be8",
+        "order": 1,
+        "disp": true,
+        "width": "8"
+    },
+    {
+        "id": "fe9bc199.22463",
+        "type": "ui_group",
+        "z": "",
+        "name": "Network Setup",
+        "tab": "6f438657.375be8",
+        "order": 4,
+        "disp": false,
+        "width": "12"
+    },
+    {
+        "id": "14902bc0.c23a34",
+        "type": "ui_group",
+        "z": "",
+        "name": "Monitoring Information",
+        "tab": "6f438657.375be8",
+        "order": 5,
+        "disp": false,
+        "width": "12"
+    },
+    {
+        "id": "e648c618.a069a8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Charts",
+        "tab": "6f438657.375be8",
+        "order": 7,
+        "disp": true,
+        "width": "24"
+    },
+    {
+        "id": "be9d8c98.cb934",
+        "type": "ui_group",
+        "z": "",
+        "name": "Messages",
+        "tab": "6f438657.375be8",
+        "order": 6,
+        "disp": false,
+        "width": "24"
+    },
+    {
+        "id": "fa8d6744.b57598",
+        "type": "ui_group",
+        "z": "",
+        "name": "Topology Visualization",
+        "tab": "1fa57777.e675f9",
+        "order": 2,
+        "disp": true,
+        "width": "33"
+    },
+    {
+        "id": "6f438657.375be8",
+        "type": "ui_tab",
+        "z": "",
+        "name": "CORAL-SDN Dashboard",
+        "icon": "dashboard",
+        "order": 7
+    },
+    {
+        "id": "cb65aebd.8aa4f",
+        "type": "ui_tab",
+        "z": "",
+        "name": "SDN - TOP Debug",
+        "icon": "dashboard",
+        "order": 9
+    },
+    {
+        "id": "1fa57777.e675f9",
+        "type": "ui_tab",
+        "z": "",
+        "name": "SDN - TOP DEV",
+        "icon": "dashboard",
+        "order": 10
+    }
+]
