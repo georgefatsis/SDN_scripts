@@ -14,7 +14,7 @@
 
 . ./functions.sh
 Log "Each script is starting at new terminal"
-Log "1compile_onos is starting at a new terninal"
+Log "1compile_onos is starting at a new terminal"
 gnome-terminal -e "bash -c \" ~/SDN_scripts/1compile_onos.sh; exec bash\" "
 sleep 100;
 

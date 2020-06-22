@@ -3,8 +3,8 @@
 #
 ####################################### Description ################################################
 #
-# This script is used to install the SDN-WISE along with the needed libaries and the Java SDN 
-#    controler in a clean installation of Ubuntu.
+# This script is used to install the SDN-WISE along with the needed libraries and the Java SDN 
+#    controller in a clean installation of Ubuntu.
 #
 ####################################### Arguments ##################################################
 #

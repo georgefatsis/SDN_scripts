@@ -3,7 +3,7 @@
 #
 ####################################### Description ################################################
 #
-# This script is used to Start onos controler
+# This script is used to Start Onos controller
 #
 #
 ####################################### Arguments ##################################################

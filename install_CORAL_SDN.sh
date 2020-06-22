@@ -57,5 +57,5 @@ cp -r ~/coral-sdn/control-plane/CORAL-SDN_Adapters/coral-sdn-adapter-COOJA-runti
 cd ~/coral-sdn-adapter-COOJA-runtime
 chmod +x coral-sdn-adapter createSoftLinkCreationScript.py softLinkCreationScript
 
-# Copy the controler to home 
+# Copy the controller to home 
 cp -r ~/coral-sdn/control-plane/CORAL-SDN-Controller/ ~

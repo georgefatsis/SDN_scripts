@@ -1,9 +1,9 @@
 #!/bin/bash
-## run_contiki_sdn-controler.sh ####################################################################
+## run_contiki_sdn-controller.sh ####################################################################
 #
 ####################################### Description ################################################
 #
-# This script starting the SDN-WISE Get started Java controler
+# This script starting the SDN-WISE Get started Java controller
 #
 ####################################### Arguments ##################################################
 #

@@ -3,7 +3,7 @@
 #
 ####################################### Description ################################################
 #
-# This script is used to start Mininet using the standar topology
+# This script is used to start Mininet using the standard topology
 #
 ####################################### Arguments ##################################################
 #
