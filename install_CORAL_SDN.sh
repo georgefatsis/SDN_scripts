@@ -19,19 +19,19 @@
 sudo apt-get update
 sudo apt-get install default-jdk ant maven git python-pip curl gcc-msp430 build-essential vim software-properties-common -y
 latestJdk=$(ls -lrt /usr/lib/jvm | grep "java-8-openjdk" | tail -1 | awk -F' ' '{print $9}')
-echo "JAVA_HOME=/usr/lib/jvm/$latestJdk" >> .profile
-echo "JRE_HOME=/usr/lib/jvm/$latestJdk" >> .profile
-echo "PATH=$PATH:$JRE_HOME/bin:$JAVA_HOME/binexport" >> .profile
-echo "export JAVA_HOME" >> .profile
-echo "export JRE_HOME" >> .profile
-echo "export PATH" >> .profile
+echo "JAVA_HOME=/usr/lib/jvm/$latestJdk" >> ~/.profile
+echo "JRE_HOME=/usr/lib/jvm/$latestJdk" >> ~/.profile
+echo "PATH=$PATH:$JRE_HOME/bin:$JAVA_HOME/binexport" >> ~/.profile
+echo "export JAVA_HOME" >> ~/.profile
+echo "export JRE_HOME" >> ~/.profile
+echo "export PATH" >> ~/.profile
 
 # source the updated profile 
 source ~/.profile 
 
 # Checkout contiki
 cd ~
-git clone https://github.com/SWNRG/coral-sdn.git
+git clone https://github.com/georgefatsis/coral-sdn.git
 
 # Copy Contiki to home
 cp -r ~/coral-sdn/infrastructure-plane/contiki ~
