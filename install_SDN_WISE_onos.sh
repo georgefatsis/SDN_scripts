@@ -3,11 +3,8 @@
 #
 ####################################### Description ################################################
 #
-# This script is install the SDN-WISE along with the needed libaries and the ONOS controler in a
-#   clean installation of Ubuntu.
-#
-#
-#
+# This script is used to install the SDN-WISE along with the needed libaries and the ONOS controler 
+#    in a clean installation of Ubuntu.
 #
 ####################################### Arguments ##################################################
 #

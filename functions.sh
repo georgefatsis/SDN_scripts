@@ -4,9 +4,7 @@
 ####################################### Description ################################################
 #
 # This script is holding the functions needed by the scripts.
-# Source this script in order to use the Functions.
-#
-#
+#    Source this script in order to use the Functions.
 #
 ####################################### Arguments ##################################################
 #

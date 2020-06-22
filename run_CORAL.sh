@@ -3,7 +3,7 @@
 #
 ####################################### Description ################################################
 #
-# This script starting the SDN-WISE Java basic implementation
+# This script starting the CORAL-SDN Implementation
 #
 ####################################### Arguments ##################################################
 #

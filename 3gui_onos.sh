@@ -5,9 +5,6 @@
 #
 # This script is used to start Firefox with ONOS GUI
 #
-#
-#
-#
 ####################################### Arguments ##################################################
 #
 # No argument is required

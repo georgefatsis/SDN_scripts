@@ -5,9 +5,6 @@
 #
 # This script is used to start cooja in contiki
 #
-#
-#
-#
 ####################################### Arguments ##################################################
 #
 # No argument is required

@@ -5,9 +5,6 @@
 #
 # This script is used to start ONOS Shell
 #
-#
-#
-#
 ####################################### Arguments ##################################################
 #
 # No argument is required

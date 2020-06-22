@@ -3,11 +3,8 @@
 #
 ####################################### Description ################################################
 #
-# This script is install the CORAL-SDN along with the needed libaries in a clean installation of
-#   Ubuntu using a VM.
-#
-#
-#
+# This script is used to install the CORAL-SDN along with the needed libraries in a clean 
+#   installation of Ubuntu using a VM.
 #
 ####################################### Arguments ##################################################
 #
@@ -17,7 +14,10 @@
 
 # Update to Java 8 and install Ant and Maven
 sudo apt-get update
-sudo apt-get install default-jdk ant maven git python-pip curl gcc-msp430 build-essential vim software-properties-common -y
+sudo apt-get install default-jdk ant maven git python-pip curl gcc-msp430 build-essential vim \
+   software-properties-common -y
+   
+# Update the .profile with the Java Paths
 latestJdk=$(ls -lrt /usr/lib/jvm | grep "java-8-openjdk" | tail -1 | awk -F' ' '{print $9}')
 echo "JAVA_HOME=/usr/lib/jvm/$latestJdk" >> ~/.profile
 echo "JRE_HOME=/usr/lib/jvm/$latestJdk" >> ~/.profile

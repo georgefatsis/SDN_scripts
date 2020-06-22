@@ -5,9 +5,6 @@
 #
 # This script is used to start Cooja
 #
-#
-#
-#
 ####################################### Arguments ##################################################
 #
 # No argument is required

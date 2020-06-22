@@ -6,8 +6,6 @@
 # This script is wrapper script and its usage is to start in a separate terminal all the scripts
 #    needed for the SDN-WISE with ONOS.
 #
-#
-#
 ####################################### Arguments ##################################################
 #
 # No argument is required

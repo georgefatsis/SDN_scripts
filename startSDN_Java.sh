@@ -6,8 +6,6 @@
 # This wrapper script is used to executed all the other scripts needed in order to start Cooja and
 #   the Java 01 controler for SDN-WISE.
 #
-#
-#
 ####################################### Arguments ##################################################
 #
 # No argument is required
