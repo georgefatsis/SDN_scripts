@@ -31,7 +31,7 @@ source ~/.profile
 
 # Checkout contiki
 cd ~
-git clone https://github.com/georgefatsis/coral-sdn.git
+git clone https://github.com/SWNRG/coral-sdn.git
 
 # Copy Contiki to home
 cp -r ~/coral-sdn/infrastructure-plane/contiki ~
