@@ -19,7 +19,7 @@ gnome-terminal -e "bash -c \" ~/SDN_scripts/startcooja.sh; exec bash\" "
 sleep 60;
 
 Log "Starting CORAL Controller"
-gnome-terminal -e "bash -c \" cd ~/CORAL-SDN-Controller ; java -jar CoralSDNControler.jar; exec bash\" "
+gnome-terminal -e "bash -c \" cd ~/CORAL-SDN-Controller ; java -jar CoralSDNController.jar; exec bash\" "
 sleep 60; 
 
 Log "Coral Adapter is starting"
